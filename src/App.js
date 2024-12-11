@@ -10,10 +10,22 @@ const App = () => {
   const [totalRecipients, setTotalRecipients] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
-  const sendEmail = async (smtpClient, emailData) => {
+  const sendEmail = async (emailData) => {
     try {
-      await smtpClient.sendAsync(emailData);
-      return { success: true };
+      const response = await fetch("https://thebuoyancyui.com/send", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(emailData),
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        return { success: true };
+      } else {
+        return { success: false, error: result.error };
+      }
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -23,7 +35,7 @@ const App = () => {
     const file = e.target.files[0];
     if (file) {
       const text = await file.text();
-      const recipients = text.split(/\r?\n/).filter((line) => line.trim() !== "").join("; ");
+      const recipients = text.split(/\r?\n/).filter((line) => line.trim() !== "").join(", ");
       setValue("recipients", recipients);
     }
   };
@@ -34,33 +46,19 @@ const App = () => {
     setIsLoading(true);
     setStatus("Sending...");
 
-    const attachments = data.attachments
-      ? Array.from(data.attachments).map((file) => ({
-          name: file.name,
-          content: file,
-        }))
-      : [];
-
-    const smtpClient = new window.SMTPClient({
-      host: data.smtpServer,
-      port: data.smtpPort,
-      secure: data.smtpPort === 465,
-      auth: {
-        user: data.username,
-        pass: data.smtpPassword,
-      },
-    });
-
     for (let i = 0; i < recipients.length; i++) {
       const emailData = {
+        smtpServer: data.smtpServer,
+        smtpPort: data.smtpPort,
+        username: data.username,
+        password: data.smtpPassword,
         from: `${data.fromName} <${data.fromEmail}>`,
         to: recipients[i],
         subject: data.subject,
-        text: data.message,
-        attachments,
+        message: data.message,
       };
 
-      const result = await sendEmail(smtpClient, emailData);
+      const result = await sendEmail(emailData);
 
       if (result.success) {
         setStatus((prev) => `${prev}\nEmail sent to ${recipients[i]} - OK`);
@@ -83,7 +81,7 @@ const App = () => {
   return (
     <div className="p-6 max-w-4xl mx-auto bg-gradient-to-br from-gray-100 to-blue-50 min-h-screen flex flex-col items-center">
       <motion.h1
-        className="text-5xl font-extrabold text-center mb-6 bg-gradient-to-r from-purple-500 to-indigo-500 text-white  px-6 py-3 rounded-lg hover:scale-105 transition-transform"
+        className="text-5xl font-extrabold text-center mb-6 bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-6 py-3 rounded-lg hover:scale-105 transition-transform"
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -137,6 +135,22 @@ const App = () => {
               type="password"
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
               {...register("smtpPassword", { required: true })}
+            />
+          </div>
+          <div>
+            <label className="block mb-2 text-lg font-medium text-gray-700">From Name</label>
+            <input
+              type="text"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              {...register("fromName", { required: true })}
+            />
+          </div>
+          <div>
+            <label className="block mb-2 text-lg font-medium text-gray-700">From Email</label>
+            <input
+              type="email"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              {...register("fromEmail", { required: true })}
             />
           </div>
         </div>
