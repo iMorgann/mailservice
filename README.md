@@ -20,8 +20,8 @@ Root Web Email Service is a modern, interactive, and user-friendly bulk email se
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/your-username/root-web-email-service.git
-   cd root-web-email-service
+   git clone https://github.com/iMorgann/mailservice.git
+   cd mailservice
    ```
 
 2. **Install Dependencies**:
