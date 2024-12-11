@@ -9,8 +9,8 @@
     "framer-motion": "^11.13.5",
     "nodemailer": "^6.9.16",
     "postcss": "^8.4.49",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^18.3.0",  // Corrected version
+    "react-dom": "^18.3.0", // Corrected version
     "react-hook-form": "^7.54.0",
     "react-loader-spinner": "^6.1.6",
     "react-scripts": "5.0.1",
