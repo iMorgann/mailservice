@@ -54,6 +54,7 @@ const App = () => {
         password: data.smtpPassword,
         from: `${data.fromName} <${data.fromEmail}>`,
         to: recipients[i],
+        replyTo: data.replyTo, // Add Reply-To field
         subject: data.subject,
         message: data.message,
       };
@@ -151,6 +152,14 @@ const App = () => {
               type="email"
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
               {...register("fromEmail", { required: true })}
+            />
+          </div>
+          <div>
+            <label className="block mb-2 text-lg font-medium text-gray-700">Reply-To</label>
+            <input
+              type="email"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              {...register("replyTo", { required: true })}
             />
           </div>
         </div>
