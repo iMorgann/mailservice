@@ -35,13 +35,19 @@ const App = () => {
     const file = e.target.files[0];
     if (file) {
       const text = await file.text();
-      const recipients = text.split(/\r?\n/).filter((line) => line.trim() !== "").join(", ");
+      const recipients = text
+        .split(/\r?\n/)
+        .filter((line) => line.trim() !== "")
+        .join(", ");
       setValue("recipients", recipients);
     }
   };
 
   const onSubmit = async (data) => {
-    const recipients = data.recipients.split(/[,;\s\n]+/).filter((line) => line.trim() !== "");
+    const recipients = data.recipients
+      .split(/[,;\s\n]+/)
+      .filter((line) => line.trim() !== "");
+
     setTotalRecipients(recipients.length);
     setIsLoading(true);
     setStatus("Sending...");
@@ -54,7 +60,7 @@ const App = () => {
         password: data.smtpPassword,
         from: `${data.fromName} <${data.fromEmail}>`,
         to: recipients[i],
-        replyTo: data.replyTo, // Add Reply-To field
+        replyTo: data.replyTo,
         subject: data.subject,
         message: data.message,
       };
@@ -76,7 +82,25 @@ const App = () => {
 
     setStatus((prev) => `${prev}\nAll emails processed.`);
     setIsLoading(false);
-    reset();
+
+    //  Instead of clearing everything, do a partial reset here:
+    // reset({
+    //    Keep these fields populated with the same values they had:
+    //   smtpServer: data.smtpServer,
+    //   smtpPort: data.smtpPort,
+    //   username: data.username,
+    //   smtpPassword: data.smtpPassword,
+    //   fromName: data.fromName,
+    //   fromEmail: data.fromEmail,
+    //   replyTo: data.replyTo,
+
+    //    Reset these to empty or default:
+    //   recipients: "",
+    //   subject: "",
+    //   message: "",
+    //   attachments: [],
+    //   sendInterval: ""
+    // });
   };
 
   return (
