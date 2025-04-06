@@ -1,77 +1,85 @@
-# Root Web Email Service
+# Modern Email Service
 
-Root Web Email Service is a modern, interactive, and user-friendly bulk email sending application. Designed with seamless functionality and beautiful animations, it empowers users to send personalized bulk emails effortlessly.
+A powerful, secure, and efficient email delivery system built with React.
 
 ## Features
 
-- **SMTP Configuration**: Input custom SMTP details (Server, Port, Username, Password).
-- **Recipient Management**:
-  - Add recipients manually (line-by-line or comma-separated).
-  - Upload recipient lists via text files.
-- **Progress Tracking**:
-  - Real-time progress bar showing email sending status.
-  - Detailed status messages for each recipient.
-- **Attachments**: Include multiple attachments in emails.
-- **Send Interval**: Customize the time interval between sending each email.
-- **Responsive Design**: Works beautifully on any device.
-- **Support**: Contact support via Telegram [@rootbck](https://t.me/rootbck).
+- **Custom SMTP Configuration**: Connect to any SMTP server
+- **HTML & Plain Text Emails**: Rich text editor for HTML emails
+- **Bulk Email Processing**: Send to thousands of recipients
+- **Multi-threading**: Parallel processing with configurable thread count
+- **Rate Limiting**: Control sending speed to avoid server blacklisting
+- **Personalization**: Use placeholders for personalized emails
+- **CSV Import**: Import recipient lists from CSV files
+- **Real-time Monitoring**: Track delivery status and success rate
+- **Email Templates**: Pre-built templates for common email types
+- **Advanced Security**: SPF, DKIM and DMARC validation
 
-## Installation
+## Getting Started
 
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/iMorgann/mailservice.git
-   cd mailservice
-   ```
+### Prerequisites
 
-2. **Install Dependencies**:
-   ```bash
-   npm install
-   ```
+- Node.js 14.x or higher
+- npm 6.x or higher
 
-3. **Start the Application**:
-   ```bash
-   npm start
-   ```
-   The application will be available at `http://localhost:3000`.
+### Installation
+
+1. Clone the repository:
+```
+git clone https://github.com/yourusername/modern-email-service.git
+cd modern-email-service
+```
+
+2. Install dependencies:
+```
+npm install
+```
+
+3. Start the development server:
+```
+npm start
+```
+
+4. Open [http://localhost:3000](http://localhost:3000) to view the application in your browser.
 
 ## Usage
 
-1. **Input SMTP Details**:
-   - Provide your SMTP Server, Port, Username, and Password.
+### Setting Up SMTP
 
-2. **Manage Recipients**:
-   - Enter recipients directly in the provided text box or upload a `.txt` file.
+1. Go to the "SMTP Settings" tab
+2. Enter your SMTP server details (server, port, username, password)
+3. Configure the sender information (from name, from email, reply-to)
+4. Adjust thread count and rate limits as needed
 
-3. **Compose Email**:
-   - Add a subject, message, and optional attachments.
+### Creating an Email
 
-4. **Send Emails**:
-   - Click the `Send Emails` button to start the sending process.
-   - Monitor progress via the interactive progress bar.
+1. Go to the "Email Setup" tab
+2. Add recipients manually or import from a CSV/TXT file
+3. Enter a subject line or choose a pre-built template
+4. Create your email content in HTML or plain text format
+5. Use placeholders like {{name}} to personalize the email
 
-## Technologies Used
+### Sending and Monitoring
 
-- **React.js**: Frontend library for building a dynamic UI.
-- **Framer Motion**: For engaging animations.
-- **React Hook Form**: Simplified form management.
-- **Tailwind CSS**: For responsive and modern styling.
-- **SMTP.js**: Direct communication with SMTP servers.
+1. Click "Send Emails" to start the email campaign
+2. Monitor the progress in real-time on the "Monitor" tab
+3. View individual email sending status and any errors
 
-## Contributing
+## Customization
 
-Contributions are welcome! To contribute:
+- Modify `src/utils/emailUtils.js` to add more email templates
+- Adjust rate limits and threading in the UI
+- Customize the UI with your brand colors by editing the `tailwind.config.js`
 
-1. Fork the repository.
-2. Create a new branch.
-3. Make your changes and commit them.
-4. Submit a pull request.
+## Security Considerations
 
-## Support
+This application simulates email sending for demonstration purposes. In a production environment:
 
-For support, contact us on Telegram at [@rootbck](https://t.me/rootbck).
+- Never store SMTP credentials in client-side code
+- Use server-side API endpoints for actual email sending
+- Implement proper authentication and authorization
+- Add rate limiting to prevent abuse
 
 ## License
 
-This project is licensed under the MIT License. See the `LICENSE` file for details.
-
+MIT
