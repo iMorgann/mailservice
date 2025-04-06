@@ -9,7 +9,7 @@ import EmailPreviewModal from "./components/EmailPreviewModal";
 import { useForm } from "react-hook-form";
 
 const API_BASE_URL =
-  process.env.REACT_APP_API_URL || "http://localhost:5000/api/email";
+  process.env.REACT_APP_API_URL || "http://grimpsy.store/api/email";
 
 // Form state persistence helper functions
 const saveFormState = (formData) => {
