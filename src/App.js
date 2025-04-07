@@ -669,6 +669,9 @@ const App = () => {
           <p className="text-gray-600 text-lg mt-2">
             Secure, efficient, and powerful email delivery system
           </p>
+          <p className="text-gray-600 text-lg mt-2">
+            Developed by ROOT, Telegram: @rootbck
+          </p>
         </motion.header>
 
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
