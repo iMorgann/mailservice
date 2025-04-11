@@ -1,6 +1,6 @@
-import React, { useRef, useEffect, useCallback } from "react";
+import React, { useRef, useEffect, useCallback, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiMail, FiUpload, FiSend, FiAlertCircle, FiRefreshCw } from "react-icons/fi";
+import { FiMail, FiUpload, FiSend, FiAlertCircle, FiRefreshCw, FiCode, FiEye } from "react-icons/fi";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css'; // Import ReactQuill styles
 import { Controller } from "react-hook-form";
@@ -26,8 +26,11 @@ const EmailTab = ({
   previewEmail
 }) => {
   const quillRef = useRef(null);
+  const codeEditorRef = useRef(null);
   const messageType = watch("messageType");
   const templateId = watch("templateId");
+  const [htmlPreview, setHtmlPreview] = useState(false);
+  const [codeEditorValue, setCodeEditorValue] = useState("");
   
   // ReactQuill editor modules configuration
   const modules = {
@@ -135,6 +138,7 @@ const EmailTab = ({
     if (template) {
       setValue("subject", template.subject);
       setValue("message", template.content);
+      setCodeEditorValue(template.content);
       
       addLog(`Applied template: ${template.name}`, "info");
     }
@@ -142,16 +146,34 @@ const EmailTab = ({
   
   // Function to insert placeholder at cursor position
   const insertPlaceholder = (placeholder) => {
-    if (messageType === "html" && quillRef.current) {
-      const quill = quillRef.current.getEditor();
-      const range = quill.getSelection();
-      if (range) {
-        quill.insertText(range.index, placeholder);
-      } else {
-        // If no selection, insert at the end
-        quill.insertText(quill.getLength() - 1, placeholder);
+    if (messageType === "html" && !htmlPreview) {
+      if (quillRef.current) {
+        const quill = quillRef.current.getEditor();
+        const range = quill.getSelection();
+        if (range) {
+          quill.insertText(range.index, placeholder);
+        } else {
+          // If no selection, insert at the end
+          quill.insertText(quill.getLength() - 1, placeholder);
+        }
+        setValue("message", quill.root.innerHTML);
       }
-      setValue("message", quill.root.innerHTML);
+    } else if (messageType === "html-code") {
+      // For code editor
+      if (codeEditorRef.current) {
+        const textarea = codeEditorRef.current;
+        const cursorPos = textarea.selectionStart;
+        const text = textarea.value;
+        const newValue = text.slice(0, cursorPos) + placeholder + text.slice(cursorPos);
+        setCodeEditorValue(newValue);
+        setValue("message", newValue);
+        
+        // Set cursor position after the inserted placeholder
+        setTimeout(() => {
+          textarea.focus();
+          textarea.setSelectionRange(cursorPos + placeholder.length, cursorPos + placeholder.length);
+        }, 0);
+      }
     } else {
       // For plain text
       const msgField = document.querySelector('textarea[name="message"]');
@@ -165,12 +187,32 @@ const EmailTab = ({
     addLog(`Inserted placeholder: ${placeholder}`, "info");
   };
   
+  // Handle code editor changes
+  const handleCodeEditorChange = (e) => {
+    const value = e.target.value;
+    setCodeEditorValue(value);
+    setValue("message", value);
+  };
+  
+  // Toggle HTML preview in code editor mode
+  const toggleHtmlPreview = () => {
+    setHtmlPreview(!htmlPreview);
+  };
+  
   // Apply template when templateId changes
   useEffect(() => {
     if (templateId) {
       applyTemplate(templateId);
     }
   }, [templateId, applyTemplate]);
+
+  // Update code editor value when message changes from outside
+  useEffect(() => {
+    const message = watch("message");
+    if (messageType === "html-code" && message !== codeEditorValue) {
+      setCodeEditorValue(message || "");
+    }
+  }, [watch("message"), messageType]);
 
   return (
     <motion.div
@@ -285,7 +327,16 @@ const EmailTab = ({
               {...register("messageType")}
               className="mr-2"
             />
-            <span>HTML</span>
+            <span>Visual HTML Editor</span>
+          </label>
+          <label className="flex items-center">
+            <input
+              type="radio"
+              value="html-code"
+              {...register("messageType")}
+              className="mr-2"
+            />
+            <span>HTML Code Editor</span>
           </label>
           <label className="flex items-center">
             <input
@@ -299,7 +350,7 @@ const EmailTab = ({
         </div>
       </div>
       
-      {/* Placeholders Section - Now using the separate component */}
+      {/* Placeholders Section */}
       <Placeholders 
         placeholders={placeholders}
         setPlaceholders={setPlaceholders}
@@ -338,6 +389,51 @@ const EmailTab = ({
               />
             )}
           />
+        ) : messageType === "html-code" ? (
+          <div className="border border-gray-300 rounded-lg overflow-hidden">
+            {/* Code Editor Toolbar */}
+            <div className="bg-gray-100 p-2 border-b border-gray-300 flex justify-between items-center">
+              <div className="flex items-center">
+                <FiCode className="text-gray-600 mr-2" />
+                <span className="text-sm font-medium text-gray-700">HTML Code Editor</span>
+              </div>
+              <button
+                type="button"
+                onClick={toggleHtmlPreview}
+                className={`text-sm px-3 py-1 rounded flex items-center gap-1 ${
+                  htmlPreview 
+                    ? "bg-indigo-100 text-indigo-700" 
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                }`}
+              >
+                <FiEye size={14} />
+                {htmlPreview ? "Edit Code" : "Preview"}
+              </button>
+            </div>
+            
+            {htmlPreview ? (
+              <div 
+                className="p-4 bg-white h-64 overflow-auto"
+                dangerouslySetInnerHTML={{ __html: codeEditorValue }}
+              />
+            ) : (
+              <Controller
+                name="message"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <textarea
+                    ref={codeEditorRef}
+                    className="w-full p-3 font-mono text-sm bg-gray-50 focus:bg-white focus:outline-none"
+                    rows="12"
+                    placeholder="<!DOCTYPE html><html><head><style></style></head><body><h1>Your HTML Content</h1></body></html>"
+                    value={codeEditorValue}
+                    onChange={handleCodeEditorChange}
+                    spellCheck="false"
+                  ></textarea>
+                )}
+              />
+            )}
+          </div>
         ) : (
           <textarea
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all"

@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FiX, FiMail, FiUser, FiMessageCircle } from 'react-icons/fi';
+import { FiX, FiMail, FiCode, FiEye } from 'react-icons/fi';
 
 const EmailPreviewModal = ({ previewData, messageType, setShowPreview }) => {
   const { subject, message, recipient, from, replyTo } = previewData;
+  const [showSource, setShowSource] = useState(false);
   
   return (
     <motion.div
@@ -55,9 +56,40 @@ const EmailPreviewModal = ({ previewData, messageType, setShowPreview }) => {
           </div>
         </div>
         
-        <div className="p-5 max-h-[calc(100vh-300px)] overflow-y-auto">
-          {messageType === 'html' ? (
-            <div dangerouslySetInnerHTML={{ __html: message }} />
+        {(messageType === 'html' || messageType === 'html-code') && (
+          <div className="border-b border-gray-200 bg-gray-100 px-5 py-2 flex justify-end">
+            <button
+              className={`text-sm px-3 py-1 rounded flex items-center gap-1 ${
+                showSource 
+                  ? "bg-indigo-100 text-indigo-700" 
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              }`}
+              onClick={() => setShowSource(!showSource)}
+            >
+              {showSource ? (
+                <>
+                  <FiEye size={14} />
+                  View Rendered
+                </>
+              ) : (
+                <>
+                  <FiCode size={14} />
+                  View Source
+                </>
+              )}
+            </button>
+          </div>
+        )}
+        
+        <div className="p-5 max-h-[calc(100vh-350px)] overflow-y-auto">
+          {(messageType === 'html' || messageType === 'html-code') ? (
+            showSource ? (
+              <pre className="bg-gray-50 p-4 rounded border border-gray-200 overflow-x-auto font-mono text-sm whitespace-pre-wrap">
+                {message}
+              </pre>
+            ) : (
+              <div className="email-preview-content" dangerouslySetInnerHTML={{ __html: message }} />
+            )
           ) : (
             <div className="whitespace-pre-wrap">{message}</div>
           )}
