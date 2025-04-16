@@ -50,6 +50,7 @@ const ServerTab = ({ register, addLog }) => {
             <option value="465">465 (SMTPS)</option>
             <option value="587">587 (SUBMISSION)</option>
             <option value="2525">2525 (Alternative)</option>
+            <option value="2526">2526 (Alternative)</option>
           </select>
         </div>
         
